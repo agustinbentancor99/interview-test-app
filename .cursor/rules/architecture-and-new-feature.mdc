@@ -1,0 +1,199 @@
+---
+description: Project architecture and how to create a new feature
+globs: src/features/**/*, src/core/**/*, src/shared/**/*, src/router/**/*
+alwaysApply: false
+---
+# Architecture and New Feature Guide
+
+## Project Architecture Overview
+
+The app follows a **feature-based architecture** with a shared **core** and **shared** layers.
+
+### Directory Structure
+
+```
+src/
+├── core/              # Shared app foundation (not feature-specific)
+│   ├── assets/        # Fonts, icons, images
+│   ├── components/    # Atomic design: atoms → molecules → organisms → templates
+│   ├── models/        # Domain interfaces and types (auth, enrolled-users, etc.)
+│   ├── providers/     # React context providers (e.g. AuthProvider)
+│   ├── services/      # App services (e.g. token.service)
+│   └── utils/         # Pure utilities (date, storage, validators)
+├── features/          # One folder per feature (feature-based modules)
+├── router/            # Routes, guards (RequireAuth, RequireGuest), route constants
+├── shared/            # Cross-cutting shared code
+│   ├── api/           # Apollo/GraphQL: hooks, mutations, queries, types per domain
+│   └── theme/         # Chakra UI theme config
+└── main.tsx
+```
+
+### Core vs Shared vs Features
+
+- **core**: Reusable UI components, domain models, auth, services, utils. No API calls; no route-specific logic.
+- **shared**: API layer (Apollo hooks, GraphQL ops, types) and theme. Used by multiple features.
+- **features**: Self-contained modules. Each feature has its own components, hooks, schemas, and screens. They consume `shared/api` and `core` components/models.
+
+### Atomic Design (core/components)
+
+UI in `core/components` follows **Atomic Design**: small, reusable pieces are composed into larger ones. Composition flows **atoms → molecules → organisms → templates**. Higher levels may use lower levels (and Chakra primitives), but not the other way around.
+
+```
+core/components/
+├── atoms/        # Smallest UI units; no composition of other core components
+├── molecules/    # Groups of atoms (and Chakra); single responsibility
+├── organisms/    # Sections of a screen; combine molecules/atoms
+└── templates/   # Page structure; place organisms and slot content
+```
+
+**Atoms** — Single, indivisible UI elements. No dependency on other `core/components`; they wrap Chakra or native elements.
+
+- Examples in this project: `button`, `icon-button`, `link-button`, `avatar`, `toggle-switch`, `code-block`.
+- Use for: buttons, icons, inputs (raw), labels, badges, single controls.
+- When to add: You need a new primitive that will be reused and possibly styled consistently (e.g. primary button, icon button).
+
+**Molecules** — Small combinations of atoms (and Chakra) that do one thing (e.g. “labeled input”, “password field”).
+
+- Examples: `field` (label + helper + error wrapper), `text-field` (Field + Chakra Input), `password-input`, `select-field`, `input-group`.
+- Composition example: `TextField` uses `Field` + Chakra `Input`; `Field` provides label, helperText, errorText.
+- Use for: form controls with label/validation, small repeated patterns.
+- When to add: A pattern repeats across features and is more than a single atom (e.g. “input with label and error”).
+
+**Organisms** — Larger blocks that form a distinct section of the UI (header, table, sidebar, dialog).
+
+- Examples: `header`, `navbar`, `sidebar`, `table`, `dialog`, `drawer`, `pagination`, `empty-state`, `action-menu`, `custom-tabs`, `error-boundary`, `toaster`.
+- Composition example: `AuthenticatedLayout` (template) uses organisms `Sidebar` and `Navbar`; organisms may use molecules (e.g. inputs in a dialog) and atoms (e.g. buttons).
+- Use for: headers, sidebars, tables, modals, complex forms, empty states.
+- When to add: A repeated “section” that is used in more than one feature or in a template.
+
+**Templates** — Page-level layout: structure and placement of organisms, with slots for content (e.g. main area).
+
+- Examples: `layout` (base), `authenticated-layout` (sidebar + navbar + main content area).
+- Composition: Templates use organisms (and optionally molecules/atoms); they do not contain feature-specific logic, only layout and slots.
+- Use for: authenticated layout, public layout, dashboard shell.
+- When to add: A new page structure (e.g. new layout variant) shared by multiple screens.
+
+**Rules of thumb**
+
+- **Import from** `@/core/components` (or from `@/core/components/atoms`, etc.) using the `index.ts` exports; do not reach into random files.
+- **Composition**: Atoms → used by molecules and organisms. Molecules → used by organisms and templates. Organisms → used by templates and by feature screens. Templates → used by feature screens.
+- **No circular dependency**: A component in a given layer must not import from a higher layer (e.g. an atom must not import an organism).
+- **Feature-specific UI**: If a component is only used in one feature, it belongs in `features/<feature>/components`, not in `core/components`. Promote to core when it becomes reused.
+
+### API Layer Pattern (shared/api)
+
+For each domain (e.g. `auth`, `enrolled-users`, `users`):
+
+```
+shared/api/<domain>/
+├── hooks/       # useGetX, useCreateX, useUpdateX, useDeleteX (use shared useQueryWithErrorMessage / useMutationWithErrorMessage)
+├── mutations/   # GraphQL mutation documents
+├── queries/     # GraphQL query documents
+└── types/       # Response/request TypeScript interfaces
+```
+
+- **Hooks** live in `shared/api` and encapsulate GraphQL + transformation to `core/models` types when needed.
+- **Features** call these hooks; they do not define GraphQL or raw API types themselves.
+
+### Routing
+
+- Routes are defined in `src/router/routes.ts` as `ROUTES` constants.
+- Route components are declared in `src/router/index.tsx`.
+- Use guards: `RequireAuth` for protected routes, `RequireGuest` for login/forgot-password/reset-password.
+- Add `errorElement={<ErrorBoundary />}` to routes that should show the app error boundary.
+
+---
+
+## How to Create a New Feature
+
+Follow these steps to add a new feature (e.g. `my-feature`) in a consistent way.
+
+### 1. Add the feature folder structure
+
+Create under `src/features/my-feature/`:
+
+```
+src/features/my-feature/
+├── components/     # UI components used only in this feature
+│   └── index.ts    # Re-export public components
+├── hooks/          # Feature-specific hooks (orchestration, local state)
+├── schemas/        # Yup validation schemas for forms
+├── screens/        # Top-level page components (one per route)
+│   └── index.ts    # Re-export screens
+└── utils/          # (Optional) Feature-specific helpers
+```
+
+- **components**: Only what this feature needs. Use `core/components` (atoms, molecules, organisms, templates) for generic UI.
+- **hooks**: Business/UI logic for this feature. For data fetching, call hooks from `shared/api/<domain>`.
+- **schemas**: Yup schemas used with React Hook Form + `@hookform/resolvers`.
+- **screens**: One screen per main route; they compose components and hooks.
+
+### 2. Add or reuse the API layer
+
+- If the feature needs **new** backend operations:
+  - Under `shared/api/`, create or use an existing domain folder (e.g. `shared/api/my-domain/`).
+  - Add `queries/`, `mutations/`, `types/`, and `hooks/` following existing patterns (see `shared/api/enrolled-users` or `shared/api/users`).
+  - Use `useQueryWithErrorMessage` and `useMutationWithErrorMessage` from `shared/api/hooks` in your API hooks.
+- If the feature only uses **existing** operations: call the existing hooks from `shared/api/<domain>/hooks`.
+
+### 3. Add domain models (if needed)
+
+- If the feature introduces **new** domain entities, add interfaces/types under `core/models/` (e.g. `core/models/my-feature/`).
+- Keep API response types in `shared/api/<domain>/types` and map to `core/models` in the API hooks.
+
+### 4. Register routes
+
+1. **Add route constants** in `src/router/routes.ts`:
+
+```typescript
+export const ROUTES = {
+  // ...existing
+  MY_FEATURE: 'my-feature',
+  MY_FEATURE_DETAIL: 'my-feature/:id',
+} as const;
+```
+
+2. **Add route and guard** in `src/router/index.tsx`:
+
+```tsx
+import { MyFeatureScreen } from '@/features/my-feature/screens';
+
+// Inside <Routes>:
+<Route
+  path={ROUTES.MY_FEATURE}
+  errorElement={<ErrorBoundary />}
+  element={
+    <RequireAuth>
+      <MyFeatureScreen />
+    </RequireAuth>
+  }
+/>
+```
+
+- Use `RequireAuth` for authenticated pages, `RequireGuest` for login/forgot-password/reset-password only.
+
+### 5. Naming and file conventions
+
+- **Screens**: `PascalCase.screen.tsx` (e.g. `MyFeature.screen.tsx`) and export from `screens/index.ts`.
+- **Components**: PascalCase for components, kebab-case for files (e.g. `MyComponent.tsx`).
+- **Hooks**: `use` prefix, camelCase (e.g. `useMyFeatureData.ts`).
+- **Schemas**: Descriptive names (e.g. `myFeatureForm.schema.ts`).
+- Use `@/` path alias for imports (e.g. `@/core/models`, `@/shared/api`, `@/features/my-feature/screens`).
+
+### 6. What to avoid
+
+- Do **not** put GraphQL documents, API types, or data-fetching logic inside `features/`; keep them in `shared/api/`.
+- Do **not** add new global state (e.g. Redux slices) unless the team has agreed; prefer Context or local state per feature.
+- Do **not** create new UI primitives in a feature; add reusable pieces to `core/components` (atoms/molecules/organisms).
+- Do **not** skip the router: every new top-level page must have a route in `router/routes.ts` and `router/index.tsx`.
+
+---
+
+## Quick Checklist for a New Feature
+
+- [ ] Create `src/features/<feature-name>/` with `components/`, `hooks/`, `schemas/`, `screens/` (and optional `utils/`).
+- [ ] Add or reuse API layer under `shared/api/<domain>/` (hooks, queries, mutations, types).
+- [ ] Add domain types in `core/models/` if new entities exist.
+- [ ] Add route constant in `src/router/routes.ts`.
+- [ ] Register route in `src/router/index.tsx` with the correct guard and `ErrorBoundary`.
+- [ ] Use `core` components and `shared` API hooks; keep feature code focused on UI and flow.
