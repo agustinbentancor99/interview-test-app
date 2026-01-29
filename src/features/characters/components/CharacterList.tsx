@@ -32,12 +32,12 @@ export function CharacterList({
     )
   }
   return (
-    <ul className="character-list">
+    <div className="character-list">
       {characters.map((c) => (
-        <li key={c.id}>
+        <div key={c.id}>
           <CharacterCard character={c} />
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }

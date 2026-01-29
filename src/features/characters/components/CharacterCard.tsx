@@ -17,11 +17,11 @@ export function CharacterCard({ character }: { character: Character }) {
           height={300}
           loading="lazy"
         />
-        <h3>{character.name}</h3>
+        <div>{character.name}</div>
         <Badge status={character.status}>{character.status}</Badge>
-        <p>
+        <div>
           {character.species} · {character.gender}
-        </p>
+        </div>
       </Card>
     </Link>
   )

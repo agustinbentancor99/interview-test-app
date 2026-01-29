@@ -123,29 +123,25 @@ button:focus-visible {
 
 /* Feature: characters */
 .filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-end;
   margin-bottom: 1.5rem;
 }
 .filters .input-group { min-width: 140px; }
 .character-list {
-  list-style: none;
   padding: 0;
   margin: 0 0 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
-.character-list > li {
-  flex: 1 1 280px;
-  max-width: 100%;
+.character-list > div {
+  min-width: 0;
 }
 .character-card-link {
   display: block;
   height: 100%;
   text-decoration: none;
+  color: inherit;
+}
+.character-card-link:hover {
   color: inherit;
 }
 .character-card {

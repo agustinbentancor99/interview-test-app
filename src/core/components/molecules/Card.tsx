@@ -5,8 +5,8 @@ type CardProps = {
 
 export function Card({ children, className = '' }: CardProps) {
   return (
-    <article className={`card ${className}`.trim()}>
+    <div className={`card ${className}`.trim()}>
       {children}
-    </article>
+    </div>
   )
 }
