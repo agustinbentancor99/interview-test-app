@@ -1,5 +1,5 @@
 
-# ELIMINO- YA ESTOY USANDO SELETEDEPISODEID
+### ELIMINO- YA ESTOY USANDO SELETEDEPISODEID
 ```typescript
 useEffect(() => {
     if (selectedEpisode != null) {
@@ -8,7 +8,7 @@ useEffect(() => {
     }
   }, [selectedEpisode]);
 ```
-# ELIMINO- ESTA REPETIDO 
+### ELIMINO- ESTA REPETIDO 
 ```typescript
   useEffect(() => {
     if (validId == null) return;
@@ -29,7 +29,7 @@ useEffect(() => {
       });
   }, [validId]);
 ```
-# ELIMINO- ESTO YA LO HACE OTRO USESFFECT CUANDO CAMBIA VALIDID
+### ELIMINO- ESTO YA LO HACE OTRO USESFFECT CUANDO CAMBIA VALIDID
 ```typescript
   useEffect(() => {
     if (validId == null) return;
@@ -37,7 +37,7 @@ useEffect(() => {
     setError(null);
   }, [validId]);
 ```
-# ELIMINO- ES UN BUCLE INFINITO 
+### ELIMINO- ES UN BUCLE INFINITO 
 ```typescript
   useEffect(() => {
     if (character != null) {
@@ -45,7 +45,7 @@ useEffect(() => {
     }
   }, [character]);
 ```
-# ELIMINO- NO LE VEO SENTIDO USAR TODA ESTA LOGICA CUANDO PUEDO LLMARLO DIRECTAMENTE ASI <h1>{`${character.name} | Rick and Morty`}</h1>
+### ELIMINO- NO LE VEO SENTIDO USAR TODA ESTA LOGICA CUANDO PUEDO LLMARLO DIRECTAMENTE ASI <h1>{`${character.name} | Rick and Morty`}</h1>
   ```typescript
   let characerName = "";
     useEffect(() => {
@@ -58,7 +58,7 @@ useEffect(() => {
   }, [character?.name]);
 ```
 
-###Creo hooks/useCharacterDetailChar.ts con los para manejar todo lo relacionado al estado de character, loading y error, usando las funciones del archivo original
+### Creo hooks/useCharacterDetailChar.ts con los para manejar todo lo relacionado al estado de character, loading y error, usando las funciones del archivo original
   ```typescript
   const [character, setCharacter] = useState<Character | null>(null);
   const [loading, setLoading] = useState(false);
@@ -66,7 +66,7 @@ useEffect(() => {
 
   const { character, loading, error, setCharacterById } = useCharacterDetailChar();
 ```
-###Creo hooks/useCharacterDetailEpisode.ts con los para manejar todo lo relacionado al estado de Episode, episodeLoading, usando las funciones del archivo original
+### Creo hooks/useCharacterDetailEpisode.ts con los para manejar todo lo relacionado al estado de Episode, episodeLoading, usando las funciones del archivo original
   ```typescript
   const [selectedEpisode, setSelectedEpisode] = useState<any>(null);
   const [episodeLoading, setEpisodeLoading] = useState(false);
