@@ -1,13 +1,15 @@
 
-###ELIMINO- YA ESTOY USANDO SELETEDEPISODEID
+# ELIMINO- YA ESTOY USANDO SELETEDEPISODEID
+```typescript
 useEffect(() => {
     if (selectedEpisode != null) {
       const t = setTimeout(() => setEpisodeLoading(true), 100);
       return () => clearTimeout(t);
     }
   }, [selectedEpisode]);
-
-###ELIMINO- ESTA REPETIDO 
+```
+# ELIMINO- ESTA REPETIDO 
+```typescript
   useEffect(() => {
     if (validId == null) return;
     setLoading(true);
@@ -26,8 +28,8 @@ useEffect(() => {
         setLoading(false);
       });
   }, [validId]);
-
-###ELIMINO- ESTO YA LO HACE OTRO USESFFECT CUANDO CAMBIA VALIDID
+```
+# ELIMINO- ESTO YA LO HACE OTRO USESFFECT CUANDO CAMBIA VALIDID
 ```typescript
   useEffect(() => {
     if (validId == null) return;
@@ -35,7 +37,7 @@ useEffect(() => {
     setError(null);
   }, [validId]);
 ```
--ELIMINO- ES UN BUCLE INFINITO 
+# ELIMINO- ES UN BUCLE INFINITO 
 ```typescript
   useEffect(() => {
     if (character != null) {
@@ -43,7 +45,7 @@ useEffect(() => {
     }
   }, [character]);
 ```
-###ELIMINO- NO LE VEO SENTIDO USAR TODA ESTA LOGICA CUANDO PUEDO LLMARLO DIRECTAMENTE ASI <h1>{`${character.name} | Rick and Morty`}</h1>
+# ELIMINO- NO LE VEO SENTIDO USAR TODA ESTA LOGICA CUANDO PUEDO LLMARLO DIRECTAMENTE ASI <h1>{`${character.name} | Rick and Morty`}</h1>
   ```typescript
   let characerName = "";
     useEffect(() => {
