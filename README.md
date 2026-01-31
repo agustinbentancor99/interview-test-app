@@ -1,78 +1,66 @@
-# Interview Test App – React Semi-Senior
 
-Aplicación de referencia para pruebas técnicas de desarrolladores **React semi-senior**. Consume la [Rick and Morty API](https://rickandmortyapi.com/documentation) y sigue una arquitectura por features con **core**, **shared** y **features**.
+-ELIMINO- YA ESTOY USANDO SELETEDEPISODEID
+useEffect(() => {
+    if (selectedEpisode != null) {
+      const t = setTimeout(() => setEpisodeLoading(true), 100);
+      return () => clearTimeout(t);
+    }
+  }, [selectedEpisode]);
 
-## Stack
+-ELIMINO- ESTA REPETIDO 
+  useEffect(() => {
+    if (validId == null) return;
+    setLoading(true);
+    setError(null);
+    apiGet<CharacterApi>(`/character/${validId}`)
+      .then((res) => {
+        setCharacter({
+          ...res,
+          status: res.status,
+        } as Character);
+      })
+      .catch((e) => {
+        setError(e instanceof Error ? e : new Error("Unknown error"));
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [validId]);
 
-- **React 19** + **TypeScript**
-- **Vite 7**
-- **React Router 7**
-- API REST: [Rick and Morty API](https://rickandmortyapi.com/api)
+-ELIMINO- ESTO YA LO HACE OTRO USESFFECT CUANDO CAMBIA VALIDID
+  useEffect(() => {
+    if (validId == null) return;
+    setCharacter(null);
+    setError(null);
+  }, [validId]);
 
-## Requisitos
+-ELIMINO- ES UN BUCLE INFINITO 
+  useEffect(() => {
+    if (character != null) {
+      setCharacter({ ...character });
+    }
+  }, [character]);
 
-- Node.js 18+
-- pnpm (recomendado) o npm
+-ELIMINO- NO LE VEO SENTIDO USAR TODA ESTA LOGICA CUANDO PUEDO LLMARLO DIRECTAMENTE ASI <h1>{`${character.name} | Rick and Morty`}</h1>
+  let characerName = "";
+    useEffect(() => {
+    if (character?.name != null) {
+      characerName = `${character.name} | Rick and Morty`;
+    }
+    return () => {
+      characerName = "Rick and Morty";
+    };
+  }, [character?.name]);
 
-## Instalación y ejecución
+-Creo hooks/useCharacterDetailChar.ts con los para manejar todo lo relacionado al estado de character, loading y error, usando las funciones del archivo original
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-```bash
-# Instalar dependencias
-pnpm install
+  const { character, loading, error, setCharacterById } = useCharacterDetailChar();
 
-# Desarrollo
-pnpm dev
-
-# Build
-pnpm build
-
-# Preview del build
-pnpm preview
-
-# Lint
-pnpm lint
-```
-
-La app corre en **http://localhost:5173**. Rutas:
-
-- `/` → redirige a `/characters`
-- `/characters` → listado de personajes con filtros y paginación
-- `/characters/:id` → detalle de un personaje
-
-## Estructura del proyecto
-
-```
-src/
-├── core/                 # Base compartida (no por feature)
-│   ├── components/       # Atomic design: atoms → molecules
-│   └── models/          # Tipos de dominio (Character, etc.)
-├── features/            # Módulos por feature
-│   └── characters/      # Listado, filtros, detalle
-│       ├── components/
-│       ├── hooks/
-│       └── screens/
-├── shared/
-│   └── api/             # Cliente REST y hooks por dominio
-│       └── characters/   # useCharacters, useCharacterById, types
-├── router/              # Rutas y constantes
-├── App.tsx
-├── main.tsx
-└── index.css
-```
-
-La guía de arquitectura y cómo añadir una nueva feature está en **`.cursor/rules/architecture-and-new-feature.mdc`**.
-
-## Uso como prueba técnica
-
-- **Solución de referencia**: esta versión implementa los criterios esperados (TypeScript, hooks, composición, estado, estructura, API en `shared`, loading/error/empty, keys estables).
-- **Criterios de evaluación**: ver [docs/EVALUATION-CRITERIA.md](docs/EVALUATION-CRITERIA.md) para la checklist al revisar entregas de candidatos.
-- **Ejercicio sugerido**: dar el repo sin la feature `characters` y pedir implementar una feature similar siguiendo la arquitectura del proyecto.
-
-## Scripts
-
-| Script   | Descripción              |
-|----------|--------------------------|
-| `pnpm dev`    | Servidor de desarrollo   |
-| `pnpm build`  | Build de producción      |
-| `pnpm preview`| Sirve el build localmente|
-| `pnpm lint`   | Ejecuta ESLint           |
+-Creo hooks/useCharacterDetailEpisode.ts con los para manejar todo lo relacionado al estado de Episode, episodeLoading, usando las funciones del archivo original
+  const [selectedEpisode, setSelectedEpisode] = useState<any>(null);
+  const [episodeLoading, setEpisodeLoading] = useState(false);
+  
+  const { selectedEpisode, episodeLoading, setSelectedEpisodeById } = useCharacterDetailEpisode();
