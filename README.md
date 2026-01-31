@@ -29,7 +29,7 @@ useEffect(() => {
       });
   }, [validId]);
 ```
-### ELIMINO- ESTO YA LO ES PARTE DE OTRA FUNCION NO LO NECESITO DUPLICADO
+### ELIMINO- ESTO YA ES PARTE DE OTRA FUNCION NO LO NECESITO DUPLICADO
 ```typescript
   useEffect(() => {
     if (validId == null) return;
