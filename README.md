@@ -1,5 +1,5 @@
 
-### ELIMINO- YA ESTOY USANDO SELETEDEPISODEID NO NECESITO ESTA LOGICA
+### ELIMINO- PQ ME DEJA LOS EPISODIOS EN LOADING
 ```typescript
 useEffect(() => {
     if (selectedEpisode != null) {
