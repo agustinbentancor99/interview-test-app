@@ -3,13 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ROUTES } from "@/router/routes";
 import { useCharacterDetailChar } from "../hooks/useCharacterDetailChar";
 import { useCharacterDetailEpisode } from "../hooks/useCharacterDetailEpisode";
-
-function getEpisodeIdFromUrl(url: string): number | null {
-  const segment = url.split("/").filter(Boolean).pop();
-  if (segment == null) return null;
-  const n = parseInt(segment, 10);
-  return Number.isNaN(n) ? null : n;
-}
+import { Spinner } from "@/core/components";
 
 function getEpisodeIdFromUrl(url: string): number | null {
   const segment = url.split('/').filter(Boolean).pop()
